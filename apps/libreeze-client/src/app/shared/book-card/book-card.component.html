@@ -1,0 +1,30 @@
+<div class="card h-100 book-card">
+    <div class="position-relative">
+        <div class="book-availability-badge" [ngClass]="{'available': book.available, 'unavailable': !book.available}">
+            {{ book.available ? 'Available' : 'Borrowed' }}
+        </div>
+        <img [src]="book.cover_image_url || 'assets/img/book-placeholder.jpg'" class="card-img-top book-cover"
+            alt="{{ book.title }}">
+    </div>
+    <div class="card-body">
+        <h5 class="card-title book-title" [title]="book.title">{{ book.title }}</h5>
+        <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
+        <p class="card-text small text-muted mb-2">ISBN: {{ book.isbn }}</p>
+        <p class="card-text small mb-3" *ngIf="book.category">{{ book.category }}</p>
+    </div>
+    <div class="card-footer bg-transparent d-flex justify-content-between">
+        <a [routerLink]="['/books', book.id]" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-info-circle me-1"></i> Details
+        </a>
+        <ng-container *ngIf="showLendButton && book.available">
+            <button class="btn btn-sm btn-success" (click)="onLend.emit(book)">
+                <i class="bi bi-box-arrow-right me-1"></i> Lend
+            </button>
+        </ng-container>
+        <ng-container *ngIf="showReturnButton && !book.available">
+            <button class="btn btn-sm btn-warning" (click)="onReturn.emit(book)">
+                <i class="bi bi-box-arrow-in-left me-1"></i> Return
+            </button>
+        </ng-container>
+    </div>
+</div>

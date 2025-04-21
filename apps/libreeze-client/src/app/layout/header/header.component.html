@@ -1,0 +1,50 @@
+<nav class="navbar navbar-expand-lg lib-bg-background lib-shadow-card">
+    <div class="container">
+        <a class="navbar-brand lib-text-primary" routerLink="/dashboard">
+            <i class="bi bi-journals me-2 h2"></i>
+            <span class="h2 navbar-brand-text">Libreeze</span>
+        </a>
+        <button class="navbar-toggler lib-text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 lib-text-primary">
+                <li class="nav-item" *ngIf="user$ | async">
+                    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+                </li>
+                <li class="nav-item" *ngIf="user$ | async">
+                    <a class="nav-link" routerLink="/books" routerLinkActive="active">Books</a>
+                </li>
+                <li class="nav-item" *ngIf="(isAdmin$ | async)">
+                    <a class="nav-link" routerLink="/lending" routerLinkActive="active">Lending</a>
+                </li>
+            </ul>
+
+            <div *ngIf="user$ | async as user; else loginButton" class="d-flex align-items-center">
+                <div ngbDropdown class="d-inline-block lib-text-primary">
+                    <button type="button" class="btn btn-outline-light" id="userDropdown" ngbDropdownToggle>
+                        {{ getUserInitials(user) }}
+                    </button>
+                    <div ngbDropdownMenu aria-labelledby="userDropdown">
+                        <a ngbDropdownItem routerLink="/auth/profile">
+                            <i class="bi bi-person me-2"></i> Profile
+                        </a>
+                        <a ngbDropdownItem (click)="signOut()">
+                            <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <ng-template #loginButton>
+                <a routerLink="/auth/login" class="btn lib-btn-outline-accent-dark lib-shadow-card text-9">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                </a>
+                <a routerLink="/auth/register" class="btn lib-btn-secondary ms-2 lib-shadow-card text-9">
+                    Register
+                </a>
+            </ng-template>
+        </div>
+    </div>
+</nav>

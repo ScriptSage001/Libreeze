@@ -1,0 +1,22 @@
+<div class="isbn-scanner">
+    <div class="scanner-header mb-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">ISBN Scanner</h5>
+        <button class="btn btn-sm btn-outline-secondary" (click)="toggleScanner()">
+            {{ isScanning ? 'Cancel' : 'Scan ISBN' }}
+        </button>
+    </div>
+
+    <div *ngIf="isScanning" class="scanner-container">
+        <div #scanner class="viewport"></div>
+        <div class="scanner-overlay"></div>
+        <p class="text-center text-muted mt-2 small">
+            Point camera at the book's barcode
+        </p>
+    </div>
+
+    <div *ngIf="lastResult && !isScanning" class="scanner-result mt-3">
+        <div class="alert alert-success">
+            <strong>ISBN found:</strong> {{ lastResult }}
+        </div>
+    </div>
+</div>

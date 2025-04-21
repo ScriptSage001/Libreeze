@@ -1,0 +1,53 @@
+<div class="sidebar bg-light p-3 h-100">
+    <h5 class="sidebar-heading text-muted mb-3">Dashboard</h5>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a routerLink="/dashboard" routerLinkActive="active" class="nav-link"
+                [routerLinkActiveOptions]="{exact: true}">
+                <i class="bi bi-speedometer2 me-2"></i> Overview
+            </a>
+        </li>
+        <li class="nav-item">
+            <a routerLink="/books" routerLinkActive="active" class="nav-link">
+                <i class="bi bi-book me-2"></i> Books
+            </a>
+        </li>
+        <li class="nav-item" *ngIf="!(isAdmin$ | async)">
+            <a routerLink="/my-books" routerLinkActive="active" class="nav-link">
+                <i class="bi bi-bookmark me-2"></i> My Books
+            </a>
+        </li>
+        <li class="nav-item" *ngIf="isAdmin$ | async">
+            <a routerLink="/books/add" routerLinkActive="active" class="nav-link">
+                <i class="bi bi-plus-circle me-2"></i> Add Book
+            </a>
+        </li>
+        <li class="nav-item" *ngIf="isAdmin$ | async">
+            <a routerLink="/lending" routerLinkActive="active" class="nav-link">
+                <i class="bi bi-arrow-left-right me-2"></i> Lending
+            </a>
+        </li>
+        <li class="nav-item" *ngIf="isAdmin$ | async">
+            <a routerLink="/lending/history" routerLinkActive="active" class="nav-link">
+                <i class="bi bi-clock-history me-2"></i> Lending History
+            </a>
+        </li>
+    </ul>
+
+    <hr>
+    <div class="dropdown">
+        <h5 class="sidebar-heading text-muted mb-3">Account</h5>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+                <a routerLink="/auth/profile" routerLinkActive="active" class="nav-link">
+                    <i class="bi bi-person me-2"></i> Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link" (click)="signOut($event)">
+                    <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

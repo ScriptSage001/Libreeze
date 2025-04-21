@@ -1,0 +1,41 @@
+.book-card {
+    transition: transform 0.2s;
+}
+
+.book-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.book-cover {
+    height: 200px;
+    object-fit: cover;
+}
+
+.book-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+
+.book-availability-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.available {
+    background-color: #28a745;
+    color: white;
+}
+
+.unavailable {
+    background-color: #dc3545;
+    color: white;
+}

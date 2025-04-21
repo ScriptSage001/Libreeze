@@ -1,0 +1,337 @@
+/* Importing Bootstrap SCSS file. */
+@use 'bootstrap/scss/bootstrap';
+
+@font-face {
+    font-family: 'Inter';
+    src: url('./assets/fonts/Inter-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('./assets/fonts/Inter-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('./assets/fonts/Inter-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('./assets/fonts/Inter-ExtraBold.woff2') format('woff2');
+    font-weight: 800;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+}
+
+:root {
+    // /* Primary colors */
+    // --color-primary: #3B82F6;
+    // --color-primary-light: #93C5FD;
+    // --color-primary-dark: #1D4ED8;
+
+    // /* Secondary colors */
+    // --color-secondary: #10B981;
+    // --color-secondary-light: #6EE7B7;
+    // --color-secondary-dark: #059669;
+
+    // /* Accent colors */
+    // --color-accent: #8B5CF6;
+    // --color-accent-light: #C4B5FD;
+    // --color-accent-dark: #6D28D9;
+
+    // /* Neutral colors */
+    // --color-background: #F9FAFB;
+    // --color-surface: #FFFFFF;
+    // --color-text-primary: #1F2937;
+    // --color-text-secondary: #6B7280;
+    // --color-text-tertiary: #9CA3AF;
+    // --color-border: #E5E7EB;
+
+    // /* Semantic colors */
+    // --color-success: #10B981;
+    // --color-warning: #F59E0B;
+    // --color-error: #EF4444;
+    // --color-info: #3B82F6;
+
+    // /* Component-specific colors */
+    // --color-header-bg: #FFFFFF;
+    // --color-sidebar-bg: #FFFFFF;
+    // --color-sidebar-active: #EFF6FF;
+    // --color-card-bg: #FFFFFF;
+    // --color-card-shadow: rgba(0, 0, 0, 0.2);
+
+    // /* Dark mode colors */
+    // --color-dark-background: #1F2937;
+    // --color-dark-surface: #374151;
+    // --color-dark-text-primary: #F9FAFB;
+    // --color-dark-text-secondary: #E5E7EB;
+
+    // /* Hover colors */
+    // --color-primary-hover: #2563eb;
+    // --color-secondary-hover: #059669;
+    // --color-accent-hover: #7c3aed;
+    // --color-success-hover: #059669;
+    // --color-warning-hover: #d97706;
+    // --color-error-hover: #dc2626;
+    // --color-info-hover: #2563eb;
+
+    // /* Primary colors */
+    // --color-primary: #000000;
+    // --color-primary-light: #333333;
+    // --color-primary-dark: #000000;
+
+    // /* Secondary colors */
+    // --color-secondary: #1F2937;
+    // --color-secondary-light: #4B5563;
+    // --color-secondary-dark: #111827;
+
+    // /* Accent colors */
+    // --color-accent: #75F5B0;
+    // --color-accent-light: #A0FFE0;
+    // --color-accent-dark: #34D399;
+
+    // /* Neutral colors */
+    // --color-background: #FFFFFF;
+    // --color-surface: #F8FAFC;
+    // --color-text-primary: #111827;
+    // --color-text-secondary: #4B5563;
+    // --color-text-tertiary: #9CA3AF;
+    // --color-border: #E5E7EB;
+
+    // /* Semantic colors */
+    // --color-success: #48D79B;
+    // --color-warning: #FBBF24;
+    // --color-error: #EF4444;
+    // --color-info: #75F5B0;
+
+    // /* Component-specific colors */
+    // --color-header-bg: #FFFFFF;
+    // --color-sidebar-bg: #F9FAFB;
+    // --color-sidebar-active: #E0F7F0;
+    // --color-card-bg: #FFFFFF;
+    // --color-card-shadow: rgba(0, 0, 0, 0.1);
+
+    // /* Dark mode */
+    // --color-dark-background: #0F172A;
+    // --color-dark-surface: #1E293B;
+    // --color-dark-text-primary: #F1F5F9;
+    // --color-dark-text-secondary: #CBD5E1;
+
+    // /* Hover colors */
+    // --color-primary-hover: #1a1a1a;
+    // --color-secondary-hover: #374151;
+    // --color-accent-hover: #5FE2A4;
+    // --color-success-hover: #34D399;
+    // --color-warning-hover: #F59E0B;
+    // --color-error-hover: #DC2626;
+    // --color-info-hover: #5FE2A4;
+
+    /* Primary: Black-based */
+    --color-primary: #000000;
+    --color-primary-light: #333333;
+    --color-primary-dark: #0B0D11;
+
+    /* Secondary Colors */
+    --color-secondary: #1F2937;
+    --color-secondary-light: #6B7280;
+    --color-secondary-dark: #0B0D11;
+
+    /* Accent: Mint green tones from Deno brand */
+    --color-accent: #70FFAF;
+    --color-accent-light: #01FF67;
+    --color-accent-dark: #00A341;
+
+    /* Secondary: Backgrounds and surfaces */
+    --color-background: #FFFFFF;
+    --color-surface: #F9FAFB;
+    --color-surface-alt: #F5F5F5;
+
+    /* Text Colors */
+    --color-text-primary: #1F2937;
+    --color-text-secondary: #6B7280;
+    --color-text-tertiary: #9CA3AF;
+    --color-text-muted: #868789;
+
+    /* Borders */
+    --color-border: #E5E7EB;
+    --color-border-strong: #E1ECF2;
+
+    /* Card & UI backgrounds */
+    --color-card-bg: #FFFFFF;
+    --color-card-muted: #ECF3FD;
+    --color-card-highlight: #E0F7F0;
+    --color-card-shadow: rgba(0, 0, 0, 0.1);
+
+    /* Header & Sidebar */
+    --color-header-bg: #FFFFFF;
+    --color-sidebar-bg: #F9FAFB;
+    --color-sidebar-active: #EFF6FF;
+
+    /* Hover Colors */
+    --color-primary-hover: #121417;
+    --color-secondary-hover: #374151;
+    --color-accent-hover: #5FE2A4;
+    --color-muted-hover: #57606A;
+
+    /* Semantic Colors */
+    --color-success: #48D79B;
+    --color-warning: #FFDB1E;
+    --color-error: #EF4444;
+    --color-info: #01C2FF;
+
+    /* Dark Mode Base */
+    --color-dark-background: #0F172A;
+    --color-dark-surface: #1E293B;
+    --color-dark-text-primary: #F9FAFB;
+    --color-dark-text-secondary: #D1D5DB;
+
+    /* Supporting secondary variants */
+    --color-secondary-muted: #56575A;
+    --color-secondary-bg: #F5F5F5;
+    --color-secondary-border: #D1D5DB;
+}
+
+/* ======= Utility classes ======= */
+
+.lib-shadow-card {
+    box-shadow: 0 2px 5px var(--color-card-shadow);
+}
+
+/* ======= Backgrounds ======= */
+@mixin lib-bg($name, $color-var, $hover-color-var: null) {
+    .lib-bg-#{$name} {
+        background-color: var(--#{$color-var});
+    }
+
+    @if $hover-color-var !=null {
+        .lib-bg-#{$name}:hover {
+            background-color: var(--#{$hover-color-var});
+        }
+    }
+}
+
+/* ======= Text colors ======= */
+@mixin lib-text($name, $color-var, $hover-color-var: null) {
+    .lib-text-#{$name} {
+        color: var(--#{$color-var});
+    }
+
+    @if $hover-color-var !=null {
+        .lib-text-#{$name}:hover {
+            color: var(--#{$hover-color-var});
+        }
+    }
+}
+
+/* ======= Generate bg and text Variants ======= */
+
+@include lib-bg('primary', 'color-primary');
+@include lib-bg('primary-light', 'color-primary-light');
+@include lib-bg('primary-dark', 'color-primary-dark');
+
+@include lib-bg('secondary', 'color-secondary');
+@include lib-bg('accent', 'color-accent');
+@include lib-bg('background', 'color-background');
+@include lib-bg('surface', 'color-surface');
+@include lib-bg('success', 'color-success');
+@include lib-bg('warning', 'color-warning');
+@include lib-bg('error', 'color-error');
+@include lib-bg('info', 'color-info');
+@include lib-bg('sidebar-active', 'color-sidebar-active');
+
+@include lib-text('primary', 'color-primary');
+@include lib-text('primary-light', 'color-primary-light');
+@include lib-text('primary-dark', 'color-primary-dark');
+@include lib-text('secondary', 'color-secondary');
+@include lib-text('accent', 'color-accent');
+@include lib-text('dark', 'color-text-primary');
+@include lib-text('medium', 'color-text-secondary');
+@include lib-text('light', 'color-text-tertiary');
+@include lib-text('success', 'color-success');
+@include lib-text('warning', 'color-warning');
+@include lib-text('error', 'color-error');
+@include lib-text('info', 'color-info');
+
+/* ======= Base Button Styles ======= */
+.lib-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    font-size: 1rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+/* ======= Solid Buttons ======= */
+@mixin lib-btn-solid($name, $bg, $hover, $text: #fff) {
+    .lib-btn-#{$name} {
+        @extend .lib-btn;
+        background-color: var(--#{$bg});
+        color: #{$text};
+    }
+
+    .lib-btn-#{$name}:hover {
+        color: #{$text};
+        background-color: var(--#{$hover});
+    }
+}
+
+/* ======= Outline Buttons ======= */
+@mixin lib-btn-outline($name, $color) {
+    .lib-btn-outline-#{$name} {
+        @extend .lib-btn;
+        background-color: transparent;
+        border-color: var(--#{$color});
+        color: var(--#{$color});
+    }
+
+    .lib-btn-outline-#{$name}:hover {
+        background-color: var(--#{$color});
+        color: #fff;
+    }
+}
+
+/* ======= Generate Button Variants ======= */
+@include lib-btn-solid('primary', 'color-primary', 'color-primary-hover');
+@include lib-btn-solid('secondary', 'color-secondary', 'color-secondary-hover');
+@include lib-btn-solid('accent', 'color-accent', 'color-accent-hover');
+@include lib-btn-solid('success', 'color-success', 'color-success-hover');
+@include lib-btn-solid('warning', 'color-warning', 'color-warning-hover');
+@include lib-btn-solid('error', 'color-error', 'color-error-hover');
+@include lib-btn-solid('info', 'color-info', 'color-info-hover');
+
+@include lib-btn-outline('primary', 'color-primary');
+@include lib-btn-outline('primary-light', 'color-primary-light');
+@include lib-btn-outline('primary-dark', 'color-primary-dark');
+
+@include lib-btn-outline('secondary', 'color-secondary');
+@include lib-btn-outline('secondary-light', 'color-secondary-light');
+@include lib-btn-outline('secondary-dark', 'color-secondary-dark');
+
+@include lib-btn-outline('accent', 'color-accent');
+@include lib-btn-outline('accent-light', 'color-accent-light');
+@include lib-btn-outline('accent-dark', 'color-accent-dark');
+
+@include lib-btn-outline('success', 'color-success');
+@include lib-btn-outline('warning', 'color-warning');
+@include lib-btn-outline('error', 'color-error');
+@include lib-btn-outline('info', 'color-info');
+
+/* ======= Font Sizes ======= */
+@for $i from 1 through 10 {
+    .text-#{$i} {
+        font-size: #{5.5 - ($i * 0.5)}rem;
+    }
+}
