@@ -11,10 +11,8 @@ export const authGuard: CanActivateFn = (route, state) => {
     take(1),
     map(user => {
       const isAuth = !!user;
-      
+      console.log('User', user);
       if (!isAuth) {
-        // Store the attempted URL for redirecting after login
-        // Use sessionStorage to persist through page refreshes but not permanently
         sessionStorage.setItem('redirectUrl', state.url);
         
         // Redirect to login page
@@ -37,8 +35,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
       if (!isAdmin) {
         router.navigate(['/dashboard']);
         return false;
-      }
-      
+      }      
       return true;
     })
   );
@@ -48,18 +45,16 @@ export const publicGuard: CanActivateFn = (route, state) => {
   const supabaseService = inject(SupabaseService);
   const router = inject(Router);
   
-  return supabaseService.user.pipe(
-    take(1),
-    map(user => {
-      const isAuth = !!user;
-      
-      if (isAuth) {
-        // If already logged in, redirect to dashboard
-        router.navigate(['/dashboard']);
-        return false;
-      }
-      
-      return true;
-    })
-  );
+  return supabaseService.getSessionUser().then(user => {
+    const isAuth = !!user;
+    console.log('User', user);
+    console.log('isAuth', isAuth);
+    if (isAuth) {
+      // If already logged in, redirect to dashboard
+      router.navigate(['/dashboard']);
+      return false;
+    }
+    
+    return true;
+  });
 };

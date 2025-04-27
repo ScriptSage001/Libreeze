@@ -1,1 +1,69 @@
-<p>register works!</p>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header lib-bg-secondary lib-text-accent text-center py-3">
+                    <h3 class="form-heading">Join Libreeze 🚀</h3>
+                </div>
+                <div class="card-body">
+                    <!-- User Registration Form -->
+                    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="fullName" formControlName="fullName"
+                                placeholder="Enter your full name"
+                                [ngClass]="{'is-invalid': submitted && f['fullName'].errors}">
+                            <div *ngIf="submitted && f['fullName'].errors" class="invalid-feedback">
+                                <div *ngIf="f['fullName'].errors['required']">Full name is required</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email" class="form-control" id="email" formControlName="email"
+                                placeholder="Enter your email"
+                                [ngClass]="{'is-invalid': submitted && f['email'].errors}">
+                            <div *ngIf="submitted && f['email'].errors" class="invalid-feedback">
+                                <div *ngIf="f['email'].errors['required']">Email is required</div>
+                                <div *ngIf="f['email'].errors['email']">Email must be valid</div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" formControlName="password"
+                                placeholder="Create a password"
+                                [ngClass]="{'is-invalid': submitted && f['password'].errors}">
+                            <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
+                                <div *ngIf="f['password'].errors['required']">Password is required</div>
+                                <div *ngIf="f['password'].errors['minlength']">Password must be at least 6 characters
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control" id="confirmPassword"
+                                formControlName="confirmPassword" placeholder="Confirm your password"
+                                [ngClass]="{'is-invalid': submitted && f['confirmPassword'].errors}">
+                            <div *ngIf="submitted && f['confirmPassword'].errors" class="invalid-feedback">
+                                <div *ngIf="f['confirmPassword'].errors['required']">Confirm Password is required</div>
+                                <div *ngIf="f['confirmPassword'].errors['mustMatch']">Passwords must match</div>
+                            </div>
+                        </div>
+                        <div class="alert alert-danger" *ngIf="error">
+                            {{ error }}
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn lib-btn-accent register-btn" [disabled]="loading">
+                                <span *ngIf="loading" class="spinner-border spinner-border-sm me-1" role="status"
+                                    aria-hidden="true"></span>
+                                Register
+                            </button>
+                        </div>
+                    </form>
+                    <div class="mt-3 text-center">
+                        <p>Already have an account? <a routerLink="/auth/login">Login here</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

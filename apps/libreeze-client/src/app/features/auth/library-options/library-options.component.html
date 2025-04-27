@@ -1,0 +1,105 @@
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow">
+                <div class="card-header lib-bg-secondary lib-text-accent text-center py-3">
+                    <h3 class="form-heading">Library Settings</h3>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="alert alert-success">
+                            <strong>Registration successful!</strong> Your account has been created.
+                        </div>
+                        <h4>What would you like to do next?</h4>
+                    </div>
+
+                    <div class="d-grid gap-3 mb-4">
+                        <button type="button" class="btn lib-btn-accent py-3 selection-btn" (click)="showCreateLibraryForm()">
+                            <i class="bi bi-building-add me-2"></i> Create a New Library
+                            <div class="small text-muted mt-1">Start your own library and become an admin</div>
+                        </button>
+
+                        <button type="button" class="btn lib-btn-secondary py-3 selection-btn" (click)="showContactAdminMessage()">
+                            <i class="bi bi-people me-2"></i> Join an Existing Library
+                            <div class="small mt-1">Connect with your library's administrator</div>
+                        </button>
+                    </div>
+
+                    <!-- Create Library Form -->
+                    <div *ngIf="showLibraryForm">
+                        <hr>
+                        <form [formGroup]="libraryForm" (ngSubmit)="createLibrary()">
+                            <h4 class="mb-3 text-center">Create a New Library</h4>
+
+                            <div class="mb-3">
+                                <label for="libraryName" class="form-label">Library Name</label>
+                                <input type="text" class="form-control" id="libraryName" formControlName="libraryName"
+                                    placeholder="Enter the name of the Library"
+                                    [ngClass]="{'is-invalid': librarySubmitted && l['libraryName'].errors}">
+                                <div *ngIf="librarySubmitted && l['libraryName'].errors" class="invalid-feedback">
+                                    <div *ngIf="l['libraryName'].errors['required']">Library name is required</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="libraryAddress" class="form-label">Library Address</label>
+                                <textarea class="form-control" id="libraryAddress" formControlName="libraryAddress"
+                                    placeholder="Enter the address of the Library"
+                                    [ngClass]="{'is-invalid': librarySubmitted && l['libraryAddress'].errors}"></textarea>
+                                <div *ngIf="librarySubmitted && l['libraryAddress'].errors" class="invalid-feedback">
+                                    <div *ngIf="l['libraryAddress'].errors['required']">Library address is required
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contactEmail" class="form-label">Contact Email</label>
+                                <input type="email" class="form-control" id="contactEmail"
+                                    formControlName="contactEmail"
+                                    [ngClass]="{'is-invalid': librarySubmitted && l['contactEmail'].errors}">
+                                <div *ngIf="librarySubmitted && l['contactEmail'].errors" class="invalid-feedback">
+                                    <div *ngIf="l['contactEmail'].errors['required']">Contact email is required</div>
+                                    <div *ngIf="l['contactEmail'].errors['email']">Email must be valid</div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="contactPhone" class="form-label">Contact Phone Number</label>
+                                <input type="tel" class="form-control" id="contactPhone" formControlName="contactPhone"
+                                    placeholder="Enter contact phone for the library"
+                                    [ngClass]="{'is-invalid': librarySubmitted && l['contactPhone'].errors}">
+                                <div *ngIf="librarySubmitted && l['contactPhone'].errors" class="invalid-feedback">
+                                    <div *ngIf="l['contactPhone'].errors['required']">Contact phone is required</div>
+                                </div>
+                            </div>
+                            <div class="alert alert-danger" *ngIf="libraryError">
+                                {{ libraryError }}
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn lib-btn-accent selection-btn" [disabled]="libraryLoading">
+                                    <span *ngIf="libraryLoading" class="spinner-border spinner-border-sm me-1"
+                                        role="status" aria-hidden="true"></span>
+                                    Create Library
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Contact Admin Message -->
+                    <div *ngIf="showAdminMessage">
+                        <hr>
+                        <div class="alert alert-info text-center">
+                            <h4 class="alert-heading">Contact Your Library Administrator</h4>
+                            <p>Please contact your Library Administrator to add you as a user for the library.</p>
+                            <hr>
+                            <p>Once they add you to the system, you'll be able to log in using the credentials you just
+                                created.</p>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn lib-btn-secondary" (click)="goToLogin()">
+                                Go to Login Page
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

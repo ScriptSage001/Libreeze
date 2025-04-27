@@ -3,28 +3,28 @@
 
 @font-face {
     font-family: 'Inter';
-    src: url('./assets/fonts/Inter-Regular.woff2') format('woff2');
+    src: url('../public/assets/fonts/Inter-Regular.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
-    src: url('./assets/fonts/Inter-SemiBold.woff2') format('woff2');
+    src: url('../public/assets/fonts/Inter-SemiBold.woff2') format('woff2');
     font-weight: 600;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
-    src: url('./assets/fonts/Inter-Bold.woff2') format('woff2');
+    src: url('../public/assets/fonts/Inter-Bold.woff2') format('woff2');
     font-weight: 700;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Inter';
-    src: url('./assets/fonts/Inter-ExtraBold.woff2') format('woff2');
+    src: url('../public/assets/fonts/Inter-ExtraBold.woff2') format('woff2');
     font-weight: 800;
     font-style: normal;
 }
@@ -289,7 +289,7 @@ body {
 }
 
 /* ======= Outline Buttons ======= */
-@mixin lib-btn-outline($name, $color) {
+@mixin lib-btn-outline($name, $color, $text: null) {
     .lib-btn-outline-#{$name} {
         @extend .lib-btn;
         background-color: transparent;
@@ -301,12 +301,24 @@ body {
         background-color: var(--#{$color});
         color: #fff;
     }
+
+    @if $text != null {
+        .lib-btn-outline-#{$name} {
+            border-color: var(--#{$text});
+            color: var(--#{$text});
+        }
+
+        .lib-btn-outline-#{$name}:hover {
+            border-color: var(--#{$text});
+            color: var(--#{$text});
+        }
+    }
 }
 
 /* ======= Generate Button Variants ======= */
 @include lib-btn-solid('primary', 'color-primary', 'color-primary-hover');
 @include lib-btn-solid('secondary', 'color-secondary', 'color-secondary-hover');
-@include lib-btn-solid('accent', 'color-accent', 'color-accent-hover');
+@include lib-btn-solid('accent', 'color-accent', 'color-accent-hover', 'color-text-primary');
 @include lib-btn-solid('success', 'color-success', 'color-success-hover');
 @include lib-btn-solid('warning', 'color-warning', 'color-warning-hover');
 @include lib-btn-solid('error', 'color-error', 'color-error-hover');
@@ -323,6 +335,7 @@ body {
 @include lib-btn-outline('accent', 'color-accent');
 @include lib-btn-outline('accent-light', 'color-accent-light');
 @include lib-btn-outline('accent-dark', 'color-accent-dark');
+@include lib-btn-outline('accent-dark-out', 'color-accent', 'color-text-primary');
 
 @include lib-btn-outline('success', 'color-success');
 @include lib-btn-outline('warning', 'color-warning');
@@ -334,4 +347,26 @@ body {
     .text-#{$i} {
         font-size: #{5.5 - ($i * 0.5)}rem;
     }
+}
+
+.form-heading {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 0;
+}
+
+.form-subtext {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0rem;
+}
+
+@media screen and (max-width: 768px) {
+    .form-heading {
+        font-size: 2.5rem;
+    }
+
+    .form-subtext {
+        font-size: 1.25rem;
+    }    
 }
