@@ -25,7 +25,8 @@
             <div *ngIf="user$ | async as user; else loginButton" class="d-flex align-items-center">
                 <div ngbDropdown class="d-inline-block lib-text-primary">
                     <button type="button" class="btn btn-outline-dark" id="userDropdown" ngbDropdownToggle>
-                        {{ getUserInitials(user) }}
+                        <img [src]="getUserProfilePhotoUrl(user) || 'assets/images/default-avatar.png'" alt="Profile Photo"
+                                    class="img-fluid rounded-circle profile-image">
                     </button>
                     <div ngbDropdownMenu aria-labelledby="userDropdown">
                         <a ngbDropdownItem routerLink="/auth/profile">

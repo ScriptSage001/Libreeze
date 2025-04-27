@@ -58,12 +58,11 @@ export class SupabaseService {
       const { data, error } = await this
                                       .supabase
                                       .from('library_users')
-                                      .select('is_admin')
-                                      .eq('user_id', userId)
-                                      .single();
+                                      .select()
+                                      .match({user_id: userId, is_admin: true});
 
       if (error) throw error;
-      this.adminSubject.next(data.is_admin || false);
+      this.adminSubject.next(data.length > 0 || false);
     } catch (error) {
       console.error('Error checking admin status:', error);
       this.adminSubject.next(false);
@@ -157,6 +156,28 @@ export class SupabaseService {
     }
   }
 
+  public async getUserLibraries(user_id: string): Promise<any[]> {
+    const { data, error } = await this.supabase
+                                        .from('library_users')
+                                        .select('*')
+                                        .eq('user_id', user_id)
+                                        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  public async getLibraryById(id: string): Promise<any> {
+    const { data, error } = await this.supabase
+                                        .from('libraries')
+                                        .select('*')
+                                        .eq('id', id)
+                                        .single();
+
+    if (error) throw error;
+    return data;
+  }
+
   // Book methods
   public async getBooks(searchTerm: string = ''): Promise<any[]> {
     let query = this.supabase
@@ -217,18 +238,17 @@ export class SupabaseService {
   }
 
   // Lending methods
-  public async getLendingHistory(memberId?: string): Promise<any[]> {
+  public async getLendingHistory(userId?: string): Promise<any[]> {
     let query = this.supabase
-      .from('lending_transactions')
-      .select(`
-        *,
-        books:book_id(id, title, author, isbn),
-        members:member_id(id, full_name, email)
-      `)
-      .order('borrowed_date', { ascending: false });
+                      .from('lending_transactions')
+                      .select(`
+                        *,
+                        library_books:library_book_id(id, book_id)
+                      `)
+                      .order('borrowed_date', { ascending: false });
 
-    if (memberId) {
-      query = query.eq('member_id', memberId);
+    if (userId) {
+      query = query.eq('user_id', userId);
     }
 
     const { data, error } = await query;
@@ -236,18 +256,17 @@ export class SupabaseService {
     return data || [];
   }
 
-  public async getCurrentBorrowings(memberId?: string): Promise<any[]> {
+  public async getCurrentBorrowings(userId?: string): Promise<any[]> {
     let query = this.supabase
-      .from('lending_transactions')
-      .select(`
-        *,
-        books:book_id(id, title, author, isbn),
-        members:member_id(id, full_name, email)
-      `)
-      .in('status', ['borrowed', 'overdue']);
+                      .from('lending_transactions')
+                      .select(`
+                        *,
+                        library_books:library_book_id(id, book_id)
+                      `)
+                      .in('status', ['borrowed', 'overdue']);
 
-    if (memberId) {
-      query = query.eq('member_id', memberId);
+    if (userId) {
+      query = query.eq('user_id', userId);
     }
 
     const { data, error } = await query;
@@ -313,9 +332,9 @@ export class SupabaseService {
     return data || [];
   }
 
-  public async getMemberById(id: string): Promise<any> {
+  public async getUserById(id: string): Promise<any> {
     const { data, error } = await this.supabase
-      .from('members')
+      .from('users')
       .select('*')
       .eq('id', id)
       .single();
@@ -324,16 +343,25 @@ export class SupabaseService {
     return data;
   }
 
-  public async updateMemberProfile(id: string, profileData: any): Promise<any> {
+  public async updateUserProfile(id: string, profileData: any): Promise<any> {
     const { data, error } = await this.supabase
-      .from('members')
-      .update(profileData)
-      .eq('id', id)
-      .select()
-      .single();
+                                        .from('users')
+                                        .update(profileData)
+                                        .eq('id', id)
+                                        .select()
+                                        .single();
 
     if (error) throw error;
     return data;
+  }
+
+  public getUserProfilePhotoUrl(userId: string): string | null {
+    const { data } = this.supabase
+                            .storage
+                            .from('libreeze')
+                            .getPublicUrl(`${userId}/profile-photo.jpg`);
+
+    return data.publicUrl;
   }
 
   // Storage methods
@@ -356,17 +384,19 @@ export class SupabaseService {
 
   public async uploadProfilePhoto(file: File, userId: string): Promise<string> {
     const fileExt = file.name.split('.').pop();
-    const filePath = `profile-photos/${userId}.${fileExt}`;
+    const filePath = `${userId}/profile-photo.${fileExt}`;
     
-    const { error } = await this.supabase.storage
-      .from('libreeze')
-      .upload(filePath, file, { upsert: true });
+    const { error } = await this.supabase
+                                    .storage
+                                    .from('libreeze')
+                                    .upload(filePath, file, { upsert: true });
     
     if (error) throw error;
     
-    const { data } = this.supabase.storage
-      .from('libreeze')
-      .getPublicUrl(filePath);
+    const { data } = this.supabase
+                            .storage
+                            .from('libreeze')
+                            .getPublicUrl(filePath);
       
     return data.publicUrl;
   }

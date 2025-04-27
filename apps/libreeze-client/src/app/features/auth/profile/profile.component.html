@@ -1,1 +1,183 @@
-<p>profile works!</p>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <div class="card shadow">
+                <div class="card-header lib-bg-secondary text-white">
+                    <h3 class="mb-0">My Profile</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="profile-image-container mb-3">
+                                <img [src]="profilePhotoUrl || 'assets/images/default-avatar.png'" alt="Profile Photo"
+                                    class="img-fluid rounded-circle profile-image">
+                            </div>
+                            <div class="mb-3">
+                                <input type="file" class="form-control" id="profilePhoto" accept="image/*"
+                                    (change)="onFileSelected($event)" #fileInput hidden>
+                                <button class="btn lib-btn-secondary" (click)="fileInput.click()">
+                                    Change Photo
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+                                <div class="mb-3">
+                                    <label for="fullName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="fullName" formControlName="fullName"
+                                        [ngClass]="{'is-invalid': submitted && f['fullName'].errors}">
+                                    <div *ngIf="submitted && f['fullName'].errors" class="invalid-feedback">
+                                        <div *ngIf="f['fullName'].errors['required']">Full name is required</div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email address</label>
+                                    <input type="email" class="form-control text-muted" id="email" formControlName="email" readonly>
+                                </div>
+                                <div class="alert alert-success" *ngIf="updateSuccess">
+                                    Profile updated successfully!
+                                </div>
+                                <div class="alert alert-danger" *ngIf="error">
+                                    {{ error }}
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn lib-btn-secondary" [disabled]="loading">
+                                        <span *ngIf="loading" class="spinner-border spinner-border-sm me-1"
+                                            role="status" aria-hidden="true"></span>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <div class="card shadow mt-4">
+                <div class="card-header lib-bg-secondary text-white">
+                    <h3 class="mb-0">My Librery Details</h3>
+                </div>
+                <div class="card-body">
+                    <!-- <div *ngFor="let lib of usersLibraries" class="row">
+                        <div class="col-md-4">
+                            <p><strong>Library Name:</strong> {{ lib.library_name }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Membership Type:</strong> {{ lib.membership_type }}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Join Date:</strong> {{ lib.membership_start_date | date }}</p>
+                        </div>
+                        <hr>
+                    </div> -->
+
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Library Name</th>
+                                    <th>Membership Type</th>
+                                    <th>Join Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let lib of usersLibraries">
+                                    <td>{{ lib.library_name }}</td>
+                                    <td>{{ lib.membership_type }}</td>
+                                    <td>{{ lib.membership_start_date | date }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12">
+            <!-- Borrowing History Section -->
+            <div class="card shadow mt-4">
+                <div class="card-header lib-bg-secondary text-white">
+                    <h3 class="mb-0">My Borrowing History</h3>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="loadingHistory" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!loadingHistory && currentBorrowings.length === 0 && lendingHistory.length === 0"
+                        class="text-center py-4">
+                        <p class="mb-0">You haven't borrowed any books yet.</p>
+                    </div>
+
+                    <!-- Current Borrowings -->
+                    <div *ngIf="currentBorrowings.length > 0" class="mb-4">
+                        <h4>Currently Borrowed</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Borrowed Date</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of currentBorrowings">
+                                        <td>{{ item.books.title }} <small class="text-muted">by {{ item.books.author
+                                                }}</small></td>
+                                        <td>{{ item.borrowed_date | date }}</td>
+                                        <td>{{ item.due_date | date }}</td>
+                                        <td>
+                                            <span class="badge"
+                                                [ngClass]="{'bg-warning': item.status === 'overdue', 'bg-info': item.status === 'borrowed'}">
+                                                {{ item.status | titlecase }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a [routerLink]="['/lending/return-book', item.id]"
+                                                class="btn btn-sm btn-outline-primary">Return</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Past Borrowings -->
+                    <div *ngIf="lendingHistory.length > 0">
+                        <h4>Past Borrowings</h4>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Book</th>
+                                        <th>Borrowed Date</th>
+                                        <th>Return Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let item of lendingHistory">
+                                        <td>{{ item.books.title }} <small class="text-muted">by {{ item.books.author
+                                                }}</small></td>
+                                        <td>{{ item.borrowed_date | date }}</td>
+                                        <td>{{ item.returned_date | date }}</td>
+                                        <td>
+                                            <span class="badge bg-success">{{ item.status | titlecase }}</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

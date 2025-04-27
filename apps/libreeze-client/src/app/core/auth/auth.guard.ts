@@ -7,22 +7,18 @@ export const authGuard: CanActivateFn = (route, state) => {
   const supabaseService = inject(SupabaseService);
   const router = inject(Router);
   
-  return supabaseService.user.pipe(
-    take(1),
-    map(user => {
-      const isAuth = !!user;
-      console.log('User', user);
-      if (!isAuth) {
-        sessionStorage.setItem('redirectUrl', state.url);
-        
-        // Redirect to login page
-        router.navigate(['/auth/login']);
-        return false;
-      }
+  return supabaseService.getSessionUser().then(user => {
+    const isAuth = !!user;
+    if (!isAuth) {
+      sessionStorage.setItem('redirectUrl', state.url);
       
-      return true;
-    })
-  );
+      // Redirect to login page
+      router.navigate(['/auth/login']);
+      return false;
+    }
+    
+    return true;
+  });
 };
 
 export const adminGuard: CanActivateFn = (route, state) => {
@@ -47,8 +43,6 @@ export const publicGuard: CanActivateFn = (route, state) => {
   
   return supabaseService.getSessionUser().then(user => {
     const isAuth = !!user;
-    console.log('User', user);
-    console.log('isAuth', isAuth);
     if (isAuth) {
       // If already logged in, redirect to dashboard
       router.navigate(['/dashboard']);
