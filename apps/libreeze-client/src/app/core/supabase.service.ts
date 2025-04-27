@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { DOCUMENT } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ export class SupabaseService {
   private userSubject = new BehaviorSubject<User | null>(null);
   private adminSubject = new BehaviorSubject<boolean>(false);
 
-  constructor() {
+  constructor(@Inject(DOCUMENT) private document: Document) {
     this.supabase = createClient(
       environment.supabaseUrl,
       environment.supabaseAnonKey
@@ -37,18 +38,31 @@ export class SupabaseService {
     });
   }
 
+  // Get current session user
+  public async getSessionUser(): Promise<User | null> {
+    return this.supabase.auth.getSession().then(({ data }) => {
+      if (data && data.session) {
+        this.userSubject.next(data.session.user);
+        this.checkAdminStatus(data.session.user.id);
+        return data.session.user;
+      } else {
+        this.userSubject.next(null);
+        return null;
+      }
+    });
+  }
+
   // Check if current user is admin
   public async checkAdminStatus(userId: string): Promise<void> {
     try {
       const { data, error } = await this
                                       .supabase
-                                      .from('members')
-                                      .select('is_admin')
-                                      .eq('id', userId)
-                                      .single();
+                                      .from('library_users')
+                                      .select()
+                                      .match({user_id: userId, is_admin: true});
 
       if (error) throw error;
-      this.adminSubject.next(data.is_admin || false);
+      this.adminSubject.next(data.length > 0 || false);
     } catch (error) {
       console.error('Error checking admin status:', error);
       this.adminSubject.next(false);
@@ -73,22 +87,25 @@ export class SupabaseService {
 
   // Auth methods
   public async signUp(email: string, password: string, fullName: string): Promise<any> {
+    const redirectUrl = `${this.document.location.origin}/auth/library-options`;
     const { data: authData, error: authError } = await this.supabase.auth.signUp({
-      email,
-      password,
+      email: email,
+      password: password,
+      options: {
+        emailRedirectTo: redirectUrl
+      }
     });
 
     if (authError) throw authError;
 
-    // If sign-up was successful, create the member record
+    // If sign-up was successful, create the user record
     if (authData.user) {
       const { error: profileError } = await this.supabase
-        .from('members')
+        .from('users')
         .insert({
           id: authData.user.id,
           full_name: fullName,
-          email: email,
-          is_admin: false // Default to non-admin
+          email: email
         });
 
       if (profileError) throw profileError;
@@ -109,6 +126,56 @@ export class SupabaseService {
 
   public async signOut(): Promise<void> {
     await this.supabase.auth.signOut();
+  }
+
+  // Library methods
+  public async createLibrary(admin_id: string, name: string, address: string, email: string, phone?: string): Promise<any> {
+    const { data: library, error: libraryError } = await this.supabase
+      .from('libraries')
+      .insert({
+        name: name,
+        address: address,
+        contact_email: email,
+        contact_phone: phone
+      })
+      .select();
+
+    if (libraryError) throw libraryError;
+
+    if(library[0].id) {
+      const { error: libUserError } = await this.supabase
+        .from('library_users')
+        .insert({ 
+          library_id: library[0].id,
+          user_id: admin_id,
+          is_admin: true,
+          member_since: new Date()
+         });
+         
+         if (libUserError) throw libUserError;
+    }
+  }
+
+  public async getUserLibraries(user_id: string): Promise<any[]> {
+    const { data, error } = await this.supabase
+                                        .from('library_users')
+                                        .select('*')
+                                        .eq('user_id', user_id)
+                                        .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  public async getLibraryById(id: string): Promise<any> {
+    const { data, error } = await this.supabase
+                                        .from('libraries')
+                                        .select('*')
+                                        .eq('id', id)
+                                        .single();
+
+    if (error) throw error;
+    return data;
   }
 
   // Book methods
@@ -171,18 +238,17 @@ export class SupabaseService {
   }
 
   // Lending methods
-  public async getLendingHistory(memberId?: string): Promise<any[]> {
+  public async getLendingHistory(userId?: string): Promise<any[]> {
     let query = this.supabase
-      .from('lending_transactions')
-      .select(`
-        *,
-        books:book_id(id, title, author, isbn),
-        members:member_id(id, full_name, email)
-      `)
-      .order('borrowed_date', { ascending: false });
+                      .from('lending_transactions')
+                      .select(`
+                        *,
+                        library_books:library_book_id(id, book_id)
+                      `)
+                      .order('borrowed_date', { ascending: false });
 
-    if (memberId) {
-      query = query.eq('member_id', memberId);
+    if (userId) {
+      query = query.eq('user_id', userId);
     }
 
     const { data, error } = await query;
@@ -190,18 +256,17 @@ export class SupabaseService {
     return data || [];
   }
 
-  public async getCurrentBorrowings(memberId?: string): Promise<any[]> {
+  public async getCurrentBorrowings(userId?: string): Promise<any[]> {
     let query = this.supabase
-      .from('lending_transactions')
-      .select(`
-        *,
-        books:book_id(id, title, author, isbn),
-        members:member_id(id, full_name, email)
-      `)
-      .in('status', ['borrowed', 'overdue']);
+                      .from('lending_transactions')
+                      .select(`
+                        *,
+                        library_books:library_book_id(id, book_id)
+                      `)
+                      .in('status', ['borrowed', 'overdue']);
 
-    if (memberId) {
-      query = query.eq('member_id', memberId);
+    if (userId) {
+      query = query.eq('user_id', userId);
     }
 
     const { data, error } = await query;
@@ -251,10 +316,10 @@ export class SupabaseService {
     return await response.json();
   }
 
-  // Member methods
-  public async getMembers(searchTerm: string = ''): Promise<any[]> {
+  // User methods
+  public async getUsers(searchTerm: string = ''): Promise<any[]> {
     let query = this.supabase
-      .from('members')
+      .from('users')
       .select('*')
       .order('full_name');
 
@@ -267,9 +332,9 @@ export class SupabaseService {
     return data || [];
   }
 
-  public async getMemberById(id: string): Promise<any> {
+  public async getUserById(id: string): Promise<any> {
     const { data, error } = await this.supabase
-      .from('members')
+      .from('users')
       .select('*')
       .eq('id', id)
       .single();
@@ -278,16 +343,25 @@ export class SupabaseService {
     return data;
   }
 
-  public async updateMemberProfile(id: string, profileData: any): Promise<any> {
+  public async updateUserProfile(id: string, profileData: any): Promise<any> {
     const { data, error } = await this.supabase
-      .from('members')
-      .update(profileData)
-      .eq('id', id)
-      .select()
-      .single();
+                                        .from('users')
+                                        .update(profileData)
+                                        .eq('id', id)
+                                        .select()
+                                        .single();
 
     if (error) throw error;
     return data;
+  }
+
+  public getUserProfilePhotoUrl(userId: string): string | null {
+    const { data } = this.supabase
+                            .storage
+                            .from('libreeze')
+                            .getPublicUrl(`${userId}/profile-photo.jpg`);
+
+    return data.publicUrl;
   }
 
   // Storage methods
@@ -310,17 +384,19 @@ export class SupabaseService {
 
   public async uploadProfilePhoto(file: File, userId: string): Promise<string> {
     const fileExt = file.name.split('.').pop();
-    const filePath = `profile-photos/${userId}.${fileExt}`;
+    const filePath = `${userId}/profile-photo.${fileExt}`;
     
-    const { error } = await this.supabase.storage
-      .from('libreeze')
-      .upload(filePath, file, { upsert: true });
+    const { error } = await this.supabase
+                                    .storage
+                                    .from('libreeze')
+                                    .upload(filePath, file, { upsert: true });
     
     if (error) throw error;
     
-    const { data } = this.supabase.storage
-      .from('libreeze')
-      .getPublicUrl(filePath);
+    const { data } = this.supabase
+                            .storage
+                            .from('libreeze')
+                            .getPublicUrl(filePath);
       
     return data.publicUrl;
   }

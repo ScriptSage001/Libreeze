@@ -1,15 +1,16 @@
-<nav class="navbar navbar-expand-lg lib-bg-background lib-shadow-card">
+<nav class="navbar navbar-expand-lg lib-bg-background lib-shadow-card py-lg-0">
     <div class="container">
-        <a class="navbar-brand lib-text-primary" routerLink="/dashboard">
-            <i class="bi bi-journals me-2 h2"></i>
-            <span class="h2 navbar-brand-text">Libreeze</span>
+        <a class="navbar-brand lib-text-primary py-0" routerLink="/dashboard">
+            <!-- <i class="bi bi-journals me-2 h2"></i>
+            <span class="h2 navbar-brand-text">Libreeze</span> -->
+            <img src="assets/images/Logo Wide.png" alt="Libreeze Logo" class="d-inline-block navbar-logo">
         </a>
         <button class="navbar-toggler lib-text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0 lib-text-primary">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 lib-text-primary"> 
                 <li class="nav-item" *ngIf="user$ | async">
                     <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
                 </li>
@@ -23,8 +24,9 @@
 
             <div *ngIf="user$ | async as user; else loginButton" class="d-flex align-items-center">
                 <div ngbDropdown class="d-inline-block lib-text-primary">
-                    <button type="button" class="btn btn-outline-light" id="userDropdown" ngbDropdownToggle>
-                        {{ getUserInitials(user) }}
+                    <button type="button" class="btn btn-outline-dark" id="userDropdown" ngbDropdownToggle>
+                        <img [src]="getUserProfilePhotoUrl(user) || 'assets/images/default-avatar.png'" alt="Profile Photo"
+                                    class="img-fluid rounded-circle profile-image">
                     </button>
                     <div ngbDropdownMenu aria-labelledby="userDropdown">
                         <a ngbDropdownItem routerLink="/auth/profile">
@@ -38,7 +40,7 @@
             </div>
 
             <ng-template #loginButton>
-                <a routerLink="/auth/login" class="btn lib-btn-outline-accent-dark lib-shadow-card text-9">
+                <a routerLink="/auth/login" class="btn lib-btn-outline-accent-dark-out lib-shadow-card text-9">
                     <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
                 </a>
                 <a routerLink="/auth/register" class="btn lib-btn-secondary ms-2 lib-shadow-card text-9">

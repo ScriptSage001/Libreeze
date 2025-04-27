@@ -7,24 +7,18 @@ export const authGuard: CanActivateFn = (route, state) => {
   const supabaseService = inject(SupabaseService);
   const router = inject(Router);
   
-  return supabaseService.user.pipe(
-    take(1),
-    map(user => {
-      const isAuth = !!user;
+  return supabaseService.getSessionUser().then(user => {
+    const isAuth = !!user;
+    if (!isAuth) {
+      sessionStorage.setItem('redirectUrl', state.url);
       
-      if (!isAuth) {
-        // Store the attempted URL for redirecting after login
-        // Use sessionStorage to persist through page refreshes but not permanently
-        sessionStorage.setItem('redirectUrl', state.url);
-        
-        // Redirect to login page
-        router.navigate(['/auth/login']);
-        return false;
-      }
-      
-      return true;
-    })
-  );
+      // Redirect to login page
+      router.navigate(['/auth/login']);
+      return false;
+    }
+    
+    return true;
+  });
 };
 
 export const adminGuard: CanActivateFn = (route, state) => {
@@ -37,8 +31,7 @@ export const adminGuard: CanActivateFn = (route, state) => {
       if (!isAdmin) {
         router.navigate(['/dashboard']);
         return false;
-      }
-      
+      }      
       return true;
     })
   );
@@ -48,18 +41,14 @@ export const publicGuard: CanActivateFn = (route, state) => {
   const supabaseService = inject(SupabaseService);
   const router = inject(Router);
   
-  return supabaseService.user.pipe(
-    take(1),
-    map(user => {
-      const isAuth = !!user;
-      
-      if (isAuth) {
-        // If already logged in, redirect to dashboard
-        router.navigate(['/dashboard']);
-        return false;
-      }
-      
-      return true;
-    })
-  );
+  return supabaseService.getSessionUser().then(user => {
+    const isAuth = !!user;
+    if (isAuth) {
+      // If already logged in, redirect to dashboard
+      router.navigate(['/dashboard']);
+      return false;
+    }
+    
+    return true;
+  });
 };

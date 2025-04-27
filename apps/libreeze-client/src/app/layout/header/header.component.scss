@@ -3,6 +3,10 @@
         letter-spacing: 0.4px;
         font-weight: 700 !important;
     }
+
+    .navbar-logo {
+        max-height: 9vh;
+    }
 }
 
 .nav-link {
@@ -11,4 +15,9 @@
 
 .active {
     font-weight: 700;
+}
+
+.profile-image {
+    width: 2.5rem;
+    height: 2.5rem;
 }

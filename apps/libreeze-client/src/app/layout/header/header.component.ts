@@ -26,6 +26,10 @@ export class HeaderComponent {
   public getUserInitials(user: User): string {
     return user.email?.charAt(0).toUpperCase() || 'U';
   }
+
+  public getUserProfilePhotoUrl(user: User): string | null {
+    return this.supabaseService.getUserProfilePhotoUrl(user.id);
+  }
   
   public signOut(): void {
     this.supabaseService.signOut();
