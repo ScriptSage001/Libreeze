@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { SupabaseService } from '../../core/supabase.service';
 import { Observable } from 'rxjs';
 import { User } from '@supabase/supabase-js';
@@ -18,7 +18,9 @@ export class HeaderComponent {
   user$: Observable<User | null>;
   isAdmin$: Observable<boolean>;
   
-  constructor(private supabaseService: SupabaseService) {
+  constructor(
+    private supabaseService: SupabaseService,
+    private router: Router ) {
     this.user$ = this.supabaseService.user;
     this.isAdmin$ = this.supabaseService.isAdmin;
   }
@@ -31,7 +33,12 @@ export class HeaderComponent {
     return this.supabaseService.getUserProfilePhotoUrl(user.id);
   }
   
-  public signOut(): void {
-    this.supabaseService.signOut();
+  public async signOut() {
+    try {
+      await this.supabaseService.signOut();
+      this.router.navigate(['/auth/login']);
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   }
 }

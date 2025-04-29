@@ -1,1 +1,193 @@
-<p>dashboard works!</p>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-3">
+            <!-- Sidebar -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-3">
+                        <img [src]="userProfile?.profile_photo_url || '/assets/images/default-avatar.png'" alt="User Avatar"
+                            class="rounded-circle me-3" width="50" height="50">
+                        <div>
+                            <h5 class="mb-0">{{ userProfile?.full_name || 'Loading...' }}</h5>
+                            <p class="text-muted mb-0">{{ isAdmin ? 'Administrator' : 'Member' }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="list-group list-group-flush">
+                        <a routerLink="/dashboard" class="list-group-item list-group-item-action active">
+                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                        </a>
+                        <a routerLink="/books/list" class="list-group-item list-group-item-action">
+                            <i class="bi bi-book me-2"></i> Browse Books
+                        </a>
+                        <a routerLink="/auth/profile" class="list-group-item list-group-item-action">
+                            <i class="bi bi-person me-2"></i> My Profile
+                        </a>
+                        <ng-container *ngIf="isAdmin">
+                            <div class="list-group-item bg-light fw-bold mt-2">Admin</div>
+                            <a routerLink="/books/add" class="list-group-item list-group-item-action">
+                                <i class="bi bi-plus-circle me-2"></i> Add New Book
+                            </a>
+                            <a routerLink="/lending/history" class="list-group-item list-group-item-action">
+                                <i class="bi bi-clock-history me-2"></i> Lending History
+                            </a>
+                        </ng-container>
+                        <a href="javascript:void(0)" (click)="logout()"
+                            class="list-group-item list-group-item-action text-danger">
+                            <i class="bi bi-box-arrow-right me-2"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <!-- Welcome Card -->
+            <div class="card shadow mb-4">
+                <div class="card-body">
+                    <h2 class="card-title">Welcome to Libreeze!</h2>
+                    <p class="card-text">Your digital library management system. Here's your reading activity at a
+                        glance:</p>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100">
+                        <div class="card-body">
+                            <i class="bi bi-book text-primary" style="font-size: 2rem;"></i>
+                            <h5 class="card-title mt-3">{{ currentBorrowings.length }}</h5>
+                            <p class="card-text text-muted">Books Currently Borrowed</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100">
+                        <div class="card-body">
+                            <i class="bi bi-clock-history text-success" style="font-size: 2rem;"></i>
+                            <h5 class="card-title mt-3">{{ totalBorrowed }}</h5>
+                            <p class="card-text text-muted">Total Books Borrowed</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card shadow text-center h-100">
+                        <div class="card-body">
+                            <i class="bi bi-exclamation-circle text-warning" style="font-size: 2rem;"></i>
+                            <h5 class="card-title mt-3">{{ overdueBooks.length }}</h5>
+                            <p class="card-text text-muted">Overdue Books</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Current Borrowings -->
+            <div class="card shadow mb-4">
+                <div class="card-header lib-bg-accent lib-text-primary">
+                    <h5 class="mb-0">Currently Borrowed Books</h5>
+                </div>
+                <div class="card-body">
+                    <div *ngIf="loading" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!loading && currentBorrowings.length === 0" class="text-center py-4">
+                        <p class="mb-3">You haven't borrowed any books yet.</p>
+                        <a routerLink="/books/list" class="btn lib-btn-accent">Browse Library</a>
+                    </div>
+
+                    <div *ngIf="!loading && currentBorrowings.length > 0" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Book Title</th>
+                                    <th>Author</th>
+                                    <th>Borrowed Date</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Library</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of currentBorrowings">
+                                    <td>{{ item.book_title }}</td>
+                                    <td>{{ item.authors }}</td>
+                                    <td>{{ item.borrow_date| date }}</td>
+                                    <td>{{ item.due_date | date }}</td>
+                                    <td>
+                                        <span class="badge"
+                                            [ngClass]="{'bg-warning': item.status === 'overdue', 'bg-info': item.status === 'borrowed'}">
+                                            {{ item.status | titlecase }}
+                                        </span>
+                                    </td>
+                                    <td>{{ item.library_name }}</td>
+                                    <td>
+                                        <a [routerLink]="['/lending/return-book', item.lending_transaction_id]"
+                                            class="btn btn-sm btn-outline-primary">Return</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Section -->
+            <div *ngIf="isAdmin" class="card shadow mb-4">
+                <div class="card-header lib-bg-accent lib-text-primary">
+                    <h5 class="mb-0">Admin Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Add New Book</h6>
+                                    <p class="card-text small">Add a new book to the library catalog.</p>
+                                    <a routerLink="/books/add" class="btn btn-sm btn-outline-primary">Add Book</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Process Book Return</h6>
+                                    <p class="card-text small">Record a book return from a library member.</p>
+                                    <a routerLink="/lending/return-book" class="btn btn-sm btn-outline-primary">
+                                        Process Return
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">Lend a Book</h6>
+                                    <p class="card-text small">Issue a book to a library member.</p>
+                                    <a routerLink="/lending/lend-book" class="btn btn-sm btn-outline-primary">Lend Book</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 class="card-title">View Lending History</h6>
+                                    <p class="card-text small">View complete history of book borrowings.</p>
+                                    <a routerLink="/lending/history" class="btn btn-sm btn-outline-primary">
+                                        View History
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

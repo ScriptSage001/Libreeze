@@ -3,6 +3,7 @@ import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DOCUMENT } from '@angular/common';
+import { LendedBook } from '../shared/models/lended-books';
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +40,11 @@ export class SupabaseService {
   }
 
   // Get current session user
-  public async getSessionUser(): Promise<User | null> {
-    return this.supabase.auth.getSession().then(({ data }) => {
+  public async getSessionUser(): Promise<User | null> {    
+    if (this.userSubject.value) {
+      return this.userSubject.value;
+    } else {
+      const { data } = await this.supabase.auth.getSession();
       if (data && data.session) {
         this.userSubject.next(data.session.user);
         this.checkAdminStatus(data.session.user.id);
@@ -49,7 +53,7 @@ export class SupabaseService {
         this.userSubject.next(null);
         return null;
       }
-    });
+    }
   }
 
   // Check if current user is admin
@@ -272,6 +276,63 @@ export class SupabaseService {
     const { data, error } = await query;
     if (error) throw error;
     return data || [];
+  }
+
+  public async getAllLendingHistory(userId: string): Promise<any[]> {
+    const { data, error } = await this.supabase
+                                        .from('lending_transactions')
+                                        .select(`
+                                          *,
+                                          library_books(
+                                            id, 
+                                            book_id, 
+                                            library_id,
+                                            libraries(
+                                              id,
+                                              name),
+                                            books(
+                                              id,
+                                              title,
+                                              publisher,
+                                              authors:book_authors(
+                                                author_id,
+                                                authors(
+                                                  id,
+                                                  name
+                                                )
+                                              )
+                                            )
+                                          )`
+                                        )
+                                        .eq('user_id', userId)
+                                        .order('borrowed_date', { ascending: false });
+
+    if (error) throw error;
+
+    var lendedBooks: LendedBook[] = [];
+
+    if (!data) return lendedBooks;    
+    
+    data.forEach(x => {
+      var lendedBook: LendedBook = {
+        user_id: userId,
+        library_id: x.library_books.library_id,
+        library_name: x.library_books.libraries.name,
+        library_book_id: x.library_books.id,
+        book_id: x.library_books.book_id,
+        book_title: x.library_books.books.title,
+        authors: x.library_books.books.authors.map((author: any) => author.authors.name).join(', '),
+        publisher: x.library_books.books.publisher,
+        lending_transaction_id: x.id,
+        status: x.status,
+        borrow_date: new Date(x.borrowed_date),
+        due_date: new Date(x.due_date),
+        returned_date: new Date(x.returned_date)
+      };
+      lendedBooks.push(lendedBook);
+    });
+
+    return lendedBooks || [];
   }
 
   public async lendBook(bookId: string, memberId: string, dueDate: string): Promise<any> {
